@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
-public class Kitchen {
+public class Permission {
 
     @EqualsAndHashCode.Include
     @Id
@@ -17,4 +17,7 @@ public class Kitchen {
 
     @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
+    private String description;
 }
