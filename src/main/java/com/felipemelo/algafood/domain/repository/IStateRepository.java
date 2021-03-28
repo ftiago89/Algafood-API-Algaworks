@@ -10,7 +10,7 @@ public interface IStateRepository {
 
     public State find(Long id);
 
-    public void save(State state);
+    public State save(State state);
 
     public void delete(Long id);
 }

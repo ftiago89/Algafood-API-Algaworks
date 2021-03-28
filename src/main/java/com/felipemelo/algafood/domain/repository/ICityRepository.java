@@ -10,7 +10,7 @@ public interface ICityRepository {
 
     public City find(Long id);
 
-    public void save(City city);
+    public City save(City city);
 
     public void delete(Long id);
 }

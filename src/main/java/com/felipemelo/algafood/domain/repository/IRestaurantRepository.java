@@ -10,7 +10,7 @@ public interface IRestaurantRepository {
 
     public Restaurant find(Long id);
 
-    public void save(Restaurant restaurant);
+    public Restaurant save(Restaurant restaurant);
 
     public void delete(Long id);
 }

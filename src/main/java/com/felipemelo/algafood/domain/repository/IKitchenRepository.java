@@ -10,7 +10,7 @@ public interface IKitchenRepository {
 
     public Kitchen find(Long id);
 
-    public void save(Kitchen kitchen);
+    public Kitchen save(Kitchen kitchen);
 
     public void delete(Long id);
 }

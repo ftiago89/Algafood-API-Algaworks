@@ -1,42 +1,44 @@
 package com.felipemelo.algafood.infrastructure.repository;
 
-import com.felipemelo.algafood.domain.entity.City;
-import com.felipemelo.algafood.domain.repository.ICityRepository;
+import com.felipemelo.algafood.domain.entity.PaymentMethod;
+import com.felipemelo.algafood.domain.repository.IPaymentMethodRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
-public class PaymentMethodRepositoryImpl implements ICityRepository {
+@Component
+public class PaymentMethodRepositoryImpl implements IPaymentMethodRepository {
 
     @PersistenceContext
     private EntityManager entityManager;
 
 
     @Override
-    public List<City> list() {
-        return entityManager.createQuery("from City", City.class).getResultList();
+    public List<PaymentMethod> list() {
+        return entityManager.createQuery("from PaymentMethod", PaymentMethod.class).getResultList();
     }
 
     @Override
-    public City find(Long id) {
-        return entityManager.find(City.class, id);
+    public PaymentMethod find(Long id) {
+        return entityManager.find(PaymentMethod.class, id);
     }
 
     @Override
-    public void save(City city) {
-        entityManager.merge(city);
+    public PaymentMethod save(PaymentMethod paymentMethod) {
+        return entityManager.merge(paymentMethod);
     }
 
     @Override
     public void delete(Long id) {
-        City city = find(id);
+        PaymentMethod paymentMethod = find(id);
 
-        if (city == null){
+        if (paymentMethod == null){
             throw new EmptyResultDataAccessException(1);
         }
 
-        entityManager.remove(city);
+        entityManager.remove(paymentMethod);
     }
 }

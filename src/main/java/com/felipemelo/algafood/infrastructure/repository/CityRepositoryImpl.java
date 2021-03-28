@@ -3,11 +3,13 @@ package com.felipemelo.algafood.infrastructure.repository;
 import com.felipemelo.algafood.domain.entity.City;
 import com.felipemelo.algafood.domain.repository.ICityRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
+@Component
 public class CityRepositoryImpl implements ICityRepository {
 
     @PersistenceContext
@@ -25,8 +27,8 @@ public class CityRepositoryImpl implements ICityRepository {
     }
 
     @Override
-    public void save(City city) {
-        entityManager.merge(city);
+    public City save(City city) {
+        return entityManager.merge(city);
     }
 
     @Override

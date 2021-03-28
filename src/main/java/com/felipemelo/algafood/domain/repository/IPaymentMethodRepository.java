@@ -10,7 +10,7 @@ public interface IPaymentMethodRepository {
 
     public PaymentMethod find(Long id);
 
-    public void save(PaymentMethod paymentMethod);
+    public PaymentMethod save(PaymentMethod paymentMethod);
 
     public void delete(Long id);
 }

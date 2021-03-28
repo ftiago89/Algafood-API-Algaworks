@@ -3,11 +3,13 @@ package com.felipemelo.algafood.infrastructure.repository;
 import com.felipemelo.algafood.domain.entity.Restaurant;
 import com.felipemelo.algafood.domain.repository.IRestaurantRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
+@Component
 public class RestaurantRepositoryImpl implements IRestaurantRepository {
 
     @PersistenceContext
@@ -25,8 +27,8 @@ public class RestaurantRepositoryImpl implements IRestaurantRepository {
     }
 
     @Override
-    public void save(Restaurant restaurant) {
-        entityManager.merge(restaurant);
+    public Restaurant save(Restaurant restaurant) {
+        return entityManager.merge(restaurant);
     }
 
     @Override

@@ -3,11 +3,13 @@ package com.felipemelo.algafood.infrastructure.repository;
 import com.felipemelo.algafood.domain.entity.State;
 import com.felipemelo.algafood.domain.repository.IStateRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
+@Component
 public class StateRepositoryImpl implements IStateRepository {
 
     @PersistenceContext
@@ -25,8 +27,8 @@ public class StateRepositoryImpl implements IStateRepository {
     }
 
     @Override
-    public void save(State state) {
-        entityManager.merge(state);
+    public State save(State state) {
+        return entityManager.merge(state);
     }
 
     @Override

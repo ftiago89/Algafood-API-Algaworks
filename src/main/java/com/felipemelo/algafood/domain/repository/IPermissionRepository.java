@@ -10,7 +10,7 @@ public interface IPermissionRepository {
 
     public Permission find(Long id);
 
-    public void save(Permission permission);
+    public Permission save(Permission permission);
 
     public void delete(Long id);
 }
