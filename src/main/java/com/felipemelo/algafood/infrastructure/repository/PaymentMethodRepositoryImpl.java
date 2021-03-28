@@ -1,0 +1,42 @@
+package com.felipemelo.algafood.infrastructure.repository;
+
+import com.felipemelo.algafood.domain.entity.City;
+import com.felipemelo.algafood.domain.repository.ICityRepository;
+import org.springframework.dao.EmptyResultDataAccessException;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.util.List;
+
+public class PaymentMethodRepositoryImpl implements ICityRepository {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+
+    @Override
+    public List<City> list() {
+        return entityManager.createQuery("from City", City.class).getResultList();
+    }
+
+    @Override
+    public City find(Long id) {
+        return entityManager.find(City.class, id);
+    }
+
+    @Override
+    public void save(City city) {
+        entityManager.merge(city);
+    }
+
+    @Override
+    public void delete(Long id) {
+        City city = find(id);
+
+        if (city == null){
+            throw new EmptyResultDataAccessException(1);
+        }
+
+        entityManager.remove(city);
+    }
+}
