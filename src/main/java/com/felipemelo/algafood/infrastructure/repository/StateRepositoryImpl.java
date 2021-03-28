@@ -4,6 +4,7 @@ import com.felipemelo.algafood.domain.entity.State;
 import com.felipemelo.algafood.domain.repository.IStateRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -27,11 +28,13 @@ public class StateRepositoryImpl implements IStateRepository {
     }
 
     @Override
+    @Transactional
     public State save(State state) {
         return entityManager.merge(state);
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         State state = find(id);
 

@@ -4,6 +4,7 @@ import com.felipemelo.algafood.domain.entity.Kitchen;
 import com.felipemelo.algafood.domain.repository.IKitchenRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -27,11 +28,13 @@ public class KitchenRepositoryImpl implements IKitchenRepository {
     }
 
     @Override
+    @Transactional
     public Kitchen save(Kitchen kitchen) {
         return entityManager.merge(kitchen);
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         Kitchen kitchen = find(id);
 

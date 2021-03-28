@@ -4,6 +4,7 @@ import com.felipemelo.algafood.domain.entity.PaymentMethod;
 import com.felipemelo.algafood.domain.repository.IPaymentMethodRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -27,11 +28,13 @@ public class PaymentMethodRepositoryImpl implements IPaymentMethodRepository {
     }
 
     @Override
+    @Transactional
     public PaymentMethod save(PaymentMethod paymentMethod) {
         return entityManager.merge(paymentMethod);
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         PaymentMethod paymentMethod = find(id);
 

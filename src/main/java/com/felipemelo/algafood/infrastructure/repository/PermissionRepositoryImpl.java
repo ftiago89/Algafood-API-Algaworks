@@ -4,6 +4,7 @@ import com.felipemelo.algafood.domain.entity.Permission;
 import com.felipemelo.algafood.domain.repository.IPermissionRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -27,11 +28,13 @@ public class PermissionRepositoryImpl implements IPermissionRepository {
     }
 
     @Override
+    @Transactional
     public Permission save(Permission permission) {
         return entityManager.merge(permission);
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         Permission permission = find(id);
 

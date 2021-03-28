@@ -4,6 +4,7 @@ import com.felipemelo.algafood.domain.entity.City;
 import com.felipemelo.algafood.domain.repository.ICityRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -27,11 +28,13 @@ public class CityRepositoryImpl implements ICityRepository {
     }
 
     @Override
+    @Transactional
     public City save(City city) {
         return entityManager.merge(city);
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         City city = find(id);
 
