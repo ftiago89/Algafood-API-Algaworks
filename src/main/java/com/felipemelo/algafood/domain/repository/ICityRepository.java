@@ -1,16 +1,9 @@
 package com.felipemelo.algafood.domain.repository;
 
 import com.felipemelo.algafood.domain.entity.City;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-public interface ICityRepository {
-
-    public List<City> list();
-
-    public City find(Long id);
-
-    public City save(City city);
-
-    public void delete(Long id);
+@Repository
+public interface ICityRepository extends JpaRepository<City, Long> {
 }

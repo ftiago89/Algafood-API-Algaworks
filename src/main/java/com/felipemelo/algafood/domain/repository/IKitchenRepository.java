@@ -1,16 +1,9 @@
 package com.felipemelo.algafood.domain.repository;
 
 import com.felipemelo.algafood.domain.entity.Kitchen;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-public interface IKitchenRepository {
-
-    public List<Kitchen> list();
-
-    public Kitchen find(Long id);
-
-    public Kitchen save(Kitchen kitchen);
-
-    public void delete(Long id);
+@Repository
+public interface IKitchenRepository extends JpaRepository<Kitchen, Long> {
 }

@@ -1,16 +1,9 @@
 package com.felipemelo.algafood.domain.repository;
 
 import com.felipemelo.algafood.domain.entity.Restaurant;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-public interface IRestaurantRepository {
-
-    public List<Restaurant> list();
-
-    public Restaurant find(Long id);
-
-    public Restaurant save(Restaurant restaurant);
-
-    public void delete(Long id);
+@Repository
+public interface IRestaurantRepository extends JpaRepository<Restaurant, Long> {
 }

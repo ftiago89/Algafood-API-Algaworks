@@ -18,11 +18,12 @@ public class KitchenRegisterService {
     private IKitchenRepository kitchenRepository;
 
     public List<Kitchen> list(){
-        return kitchenRepository.list();
+        return kitchenRepository.findAll();
     }
 
     public Kitchen find(Long id){
-        return kitchenRepository.find(id);
+        return kitchenRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException((String.format("Kitchen with code %d not found.", id))));
     }
 
     public Kitchen save(Kitchen kitchen){
@@ -31,7 +32,7 @@ public class KitchenRegisterService {
 
     public void remove(Long id){
         try{
-            kitchenRepository.delete(id);
+            kitchenRepository.delete(find(id));
         } catch (EmptyResultDataAccessException e){
             throw new EntityNotFoundException(String.format("There is no kitchen with code: %d", id));
         } catch (DataIntegrityViolationException e){

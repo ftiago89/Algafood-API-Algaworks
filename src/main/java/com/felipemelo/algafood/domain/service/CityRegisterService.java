@@ -23,20 +23,18 @@ public class CityRegisterService {
     private IStateRepository stateRepository;
 
     public List<City> list(){
-        return cityRepository.list();
+        return cityRepository.findAll();
     }
 
     public City find(Long id){
-        return cityRepository.find(id);
+        return cityRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException((String.format("City with code %d not found.", id))));
     }
 
     public City save(City city){
         Long stateId = city.getState().getId();
-        State state = stateRepository.find(stateId);
-
-        if (state == null){
-            throw new EntityNotFoundException(String.format("State with code %d not found.", stateId));
-        }
+        State state = stateRepository.findById(stateId).orElseThrow(() -> new EntityNotFoundException(
+                (String.format("State with code %d not found.", stateId))));
 
         city.setState(state);
         return cityRepository.save(city);
@@ -44,7 +42,7 @@ public class CityRegisterService {
 
     public void delete(Long id){
         try{
-            cityRepository.delete(id);
+            cityRepository.delete(find(id));
         } catch (EmptyResultDataAccessException e){
             throw new EntityNotFoundException(String.format("There is no city with code: %d", id));
         } catch (DataIntegrityViolationException e){
