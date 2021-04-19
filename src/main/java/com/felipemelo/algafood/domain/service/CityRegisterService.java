@@ -42,7 +42,7 @@ public class CityRegisterService {
 
     public void delete(Long id){
         try{
-            cityRepository.delete(find(id));
+            cityRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e){
             throw new EntityNotFoundException(String.format("There is no city with code: %d", id));
         } catch (DataIntegrityViolationException e){

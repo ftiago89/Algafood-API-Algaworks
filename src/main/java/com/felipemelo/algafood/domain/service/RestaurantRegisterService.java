@@ -42,7 +42,7 @@ public class RestaurantRegisterService {
 
     public void delete(Long id){
         try{
-            restaurantRepository.delete(find(id));
+            restaurantRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e){
             throw new EntityNotFoundException(String.format("There is no restaurant with code: %d", id));
         } catch (DataIntegrityViolationException e){

@@ -32,7 +32,7 @@ public class KitchenRegisterService {
 
     public void remove(Long id){
         try{
-            kitchenRepository.delete(find(id));
+            kitchenRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e){
             throw new EntityNotFoundException(String.format("There is no kitchen with code: %d", id));
         } catch (DataIntegrityViolationException e){
