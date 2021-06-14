@@ -3,10 +3,12 @@ package com.felipemelo.algafood.domain.entity;
 import lombok.Data;
 
 import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Data
+@Embeddable
 public class Address {
 
     @Column(name = "address_zipcode")
