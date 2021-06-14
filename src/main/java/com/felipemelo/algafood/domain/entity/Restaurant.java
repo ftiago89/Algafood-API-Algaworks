@@ -1,5 +1,6 @@
 package com.felipemelo.algafood.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -28,9 +29,11 @@ public class Restaurant {
     @JoinColumn(nullable = false)
     private Kitchen kitchen;
 
+    @JsonIgnore
     @Embedded
     private Address address;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "restaurant_payment_method",
             joinColumns = @JoinColumn(name = "restaurant_id"),
