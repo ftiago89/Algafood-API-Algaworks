@@ -15,6 +15,9 @@ public interface IRestaurantRepository
         extends CustomJpaRepository<Restaurant, Long>, IRestaurantRepositoryQueries,
         JpaSpecificationExecutor<Restaurant> {
 
+    @Query("from Restaurant r join fetch r.kitchen left join fetch r.paymentMethods")
+    List<Restaurant> findAll();
+
     List<Restaurant> queryByDeliveryTaxBetween(BigDecimal initialTax, BigDecimal finalTax);
 
     @Query("from Restaurant where name like %:name% and kitchen.id = :id")
