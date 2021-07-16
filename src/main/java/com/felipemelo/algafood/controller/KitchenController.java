@@ -1,8 +1,6 @@
 package com.felipemelo.algafood.controller;
 
 import com.felipemelo.algafood.domain.entity.Kitchen;
-import com.felipemelo.algafood.domain.exception.EntityInUseException;
-import com.felipemelo.algafood.domain.exception.EntityNotFoundException;
 import com.felipemelo.algafood.domain.service.KitchenRegisterService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,14 +53,8 @@ public class KitchenController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id){
-        try{
-            kitchenRegisterService.remove(id);
-            return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException e){
-            return ResponseEntity.notFound().build();
-        } catch (EntityInUseException e){
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id){
+        kitchenRegisterService.remove(id);
     }
 }
