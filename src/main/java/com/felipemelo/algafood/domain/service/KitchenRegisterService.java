@@ -14,6 +14,9 @@ import java.util.List;
 @Service
 public class KitchenRegisterService {
 
+    public static final String KITCHEN_NOT_FOUND = "Kitchen with code %d not found.";
+    public static final String KITCHEN_IN_USE = "Kitchen with code %d cannot be removed. It's in use by other entities";
+
     @Autowired
     private IKitchenRepository kitchenRepository;
 
@@ -21,9 +24,9 @@ public class KitchenRegisterService {
         return kitchenRepository.findAll();
     }
 
-    public Kitchen find(Long id){
+    public Kitchen findOrFail(Long id){
         return kitchenRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException((String.format("Kitchen with code %d not found.", id))));
+                () -> new EntityNotFoundException((String.format(KITCHEN_NOT_FOUND, id))));
     }
 
     public Kitchen save(Kitchen kitchen){
@@ -34,10 +37,10 @@ public class KitchenRegisterService {
         try{
             kitchenRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e){
-            throw new EntityNotFoundException(String.format("There is no kitchen with code: %d", id));
+            throw new EntityNotFoundException(String.format(KITCHEN_NOT_FOUND, id));
         } catch (DataIntegrityViolationException e){
             throw new EntityInUseException(
-                    String.format("Kitchen with code %d cannot be removed. It's in use by other entities", id));
+                    String.format(KITCHEN_IN_USE, id));
         }
     }
 }

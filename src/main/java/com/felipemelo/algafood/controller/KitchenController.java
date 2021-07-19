@@ -23,14 +23,8 @@ public class KitchenController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Kitchen> find(@PathVariable Long id){
-        Kitchen kitchen = kitchenRegisterService.find(id);
-
-        if (kitchen == null){
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(kitchen);
+    public Kitchen find(@PathVariable Long id){
+        return kitchenRegisterService.findOrFail(id);
     }
 
     @PostMapping
@@ -40,16 +34,10 @@ public class KitchenController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Kitchen> update(@PathVariable Long id, @RequestBody Kitchen kitchen){
-        Kitchen foundKitchen = kitchenRegisterService.find(id);
-
-        if (foundKitchen == null){
-            return ResponseEntity.notFound().build();
-        }
-
+    public Kitchen update(@PathVariable Long id, @RequestBody Kitchen kitchen){
+        Kitchen foundKitchen = kitchenRegisterService.findOrFail(id);
         BeanUtils.copyProperties(kitchen, foundKitchen, "id");
-        foundKitchen = kitchenRegisterService.save(foundKitchen);
-        return ResponseEntity.ok(foundKitchen);
+        return kitchenRegisterService.save(foundKitchen);
     }
 
     @DeleteMapping("/{id}")
