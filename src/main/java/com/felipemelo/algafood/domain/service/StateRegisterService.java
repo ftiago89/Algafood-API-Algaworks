@@ -14,6 +14,9 @@ import java.util.List;
 @Service
 public class StateRegisterService {
 
+    public static final String STATE_NOT_FOUND = "State with code %d not found.";
+    public static final String STATE_IN_USE = "State with code %d cannot be removed. It's in use by other entities";
+
     @Autowired
     private IStateRepository stateRepository;
 
@@ -21,9 +24,9 @@ public class StateRegisterService {
         return stateRepository.findAll();
     }
 
-    public State find(Long id){
+    public State findOrFail(Long id){
         return stateRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException((String.format("State with code %d not found.", id))));
+                () -> new EntityNotFoundException((String.format(STATE_NOT_FOUND, id))));
     }
 
     public State save(State state){
@@ -34,10 +37,10 @@ public class StateRegisterService {
         try{
             stateRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e){
-            throw new EntityNotFoundException(String.format("There is no state with code: %d", id));
+            throw new EntityNotFoundException(String.format(STATE_NOT_FOUND, id));
         } catch (DataIntegrityViolationException e){
             throw new EntityInUseException(
-                    String.format("State with code %d cannot be removed. It's in use by other entities", id));
+                    String.format(STATE_IN_USE, id));
         }
     }
 }

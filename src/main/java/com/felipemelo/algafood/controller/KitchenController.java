@@ -5,7 +5,6 @@ import com.felipemelo.algafood.domain.service.KitchenRegisterService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,12 +36,13 @@ public class KitchenController {
     public Kitchen update(@PathVariable Long id, @RequestBody Kitchen kitchen){
         Kitchen foundKitchen = kitchenRegisterService.findOrFail(id);
         BeanUtils.copyProperties(kitchen, foundKitchen, "id");
+
         return kitchenRegisterService.save(foundKitchen);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id){
-        kitchenRegisterService.remove(id);
+        kitchenRegisterService.delete(id);
     }
 }

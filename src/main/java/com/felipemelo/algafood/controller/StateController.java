@@ -25,14 +25,8 @@ public class StateController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<State> find(@PathVariable Long id){
-        State state = stateRegisterService.find(id);
-
-        if (state == null){
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(state);
+    public State find(@PathVariable Long id){
+        return stateRegisterService.findOrFail(id);
     }
 
     @PostMapping
@@ -42,27 +36,16 @@ public class StateController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<State> update(@PathVariable Long id, @RequestBody State state){
-        State foundState = stateRegisterService.find(id);
-
-        if (foundState == null){
-            return ResponseEntity.notFound().build();
-        }
-
+    public State update(@PathVariable Long id, @RequestBody State state){
+        State foundState = stateRegisterService.findOrFail(id);
         BeanUtils.copyProperties(state, foundState, "id");
-        foundState = stateRegisterService.save(foundState);
-        return ResponseEntity.ok(foundState);
+
+        return stateRegisterService.save(foundState);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id){
-        try{
-            stateRegisterService.delete(id);
-            return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException e){
-            return ResponseEntity.notFound().build();
-        } catch (EntityInUseException e){
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id){
+        stateRegisterService.delete(id);
     }
 }

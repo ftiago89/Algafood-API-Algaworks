@@ -5,7 +5,6 @@ import com.felipemelo.algafood.domain.entity.State;
 import com.felipemelo.algafood.domain.exception.EntityInUseException;
 import com.felipemelo.algafood.domain.exception.EntityNotFoundException;
 import com.felipemelo.algafood.domain.repository.ICityRepository;
-import com.felipemelo.algafood.domain.repository.IStateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -16,27 +15,29 @@ import java.util.List;
 @Service
 public class CityRegisterService {
 
+    public static final String CITY_NOT_FOUND = "City with code %d not found.";
+    public static final String CITY_IN_USE = "City with code %d cannot be removed. It's in use by other entities";
+
     @Autowired
     private ICityRepository cityRepository;
 
     @Autowired
-    private IStateRepository stateRepository;
+    private StateRegisterService stateRegisterService;
 
     public List<City> list(){
         return cityRepository.findAll();
     }
 
-    public City find(Long id){
+    public City findOrFail(Long id){
         return cityRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException((String.format("City with code %d not found.", id))));
+                () -> new EntityNotFoundException((String.format(CITY_NOT_FOUND, id))));
     }
 
     public City save(City city){
         Long stateId = city.getState().getId();
-        State state = stateRepository.findById(stateId).orElseThrow(() -> new EntityNotFoundException(
-                (String.format("State with code %d not found.", stateId))));
-
+        State state = stateRegisterService.findOrFail(stateId);
         city.setState(state);
+
         return cityRepository.save(city);
     }
 
@@ -44,10 +45,10 @@ public class CityRegisterService {
         try{
             cityRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e){
-            throw new EntityNotFoundException(String.format("There is no city with code: %d", id));
+            throw new EntityNotFoundException(String.format(CITY_NOT_FOUND, id));
         } catch (DataIntegrityViolationException e){
             throw new EntityInUseException(
-                    String.format("City with code %d cannot be removed. It's in use by other entities", id));
+                    String.format(CITY_IN_USE, id));
         }
     }
 }

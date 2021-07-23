@@ -33,7 +33,7 @@ public class KitchenRegisterService {
         return kitchenRepository.save(kitchen);
     }
 
-    public void remove(Long id){
+    public void delete(Long id){
         try{
             kitchenRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e){

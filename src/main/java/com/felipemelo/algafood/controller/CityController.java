@@ -25,50 +25,27 @@ public class CityController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<City> find(@PathVariable Long id){
-        City city = cityRegisterService.find(id);
-
-        if (city == null){
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(city);
+    public City find(@PathVariable Long id){
+        return cityRegisterService.findOrFail(id);
     }
 
     @PostMapping
-    public ResponseEntity<?> save(@RequestBody City city){
-        try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(cityRegisterService.save(city));
-        } catch (EntityNotFoundException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public City save(@RequestBody City city){
+        return cityRegisterService.save(city);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody City city){
-        City foundCity = cityRegisterService.find(id);
-
-        if (city == null){
-            return ResponseEntity.notFound().build();
-        }
-
+    public City update(@PathVariable Long id, @RequestBody City city){
+        City foundCity = cityRegisterService.findOrFail(id);
         BeanUtils.copyProperties(city, foundCity, "id");
-        try {
-            return ResponseEntity.ok(cityRegisterService.save(city));
-        } catch (EntityNotFoundException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+
+        return cityRegisterService.save(foundCity);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id){
-        try{
-           cityRegisterService.delete(id);
-           return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException e){
-            return ResponseEntity.notFound().build();
-        } catch (EntityInUseException e){
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id){
+        cityRegisterService.delete(id);
     }
 }
