@@ -36,7 +36,7 @@ public class CityController {
         try {
             return cityRegisterService.save(city);
         } catch (EntityNotFoundException e){
-            throw new BusinessException(e.getMessage());
+            throw new BusinessException(e.getMessage(), e);
         }
     }
 
@@ -48,7 +48,7 @@ public class CityController {
         try {
             return cityRegisterService.save(foundCity);
         } catch (EntityNotFoundException e){
-            throw new BusinessException(e.getMessage());
+            throw new BusinessException(e.getMessage(), e);
         }
     }
 
