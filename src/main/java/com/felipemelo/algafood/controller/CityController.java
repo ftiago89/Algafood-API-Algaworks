@@ -1,6 +1,7 @@
 package com.felipemelo.algafood.controller;
 
 import com.felipemelo.algafood.domain.entity.City;
+import com.felipemelo.algafood.domain.exception.BusinessException;
 import com.felipemelo.algafood.domain.exception.EntityInUseException;
 import com.felipemelo.algafood.domain.exception.EntityNotFoundException;
 import com.felipemelo.algafood.domain.service.CityRegisterService;
@@ -32,7 +33,11 @@ public class CityController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public City save(@RequestBody City city){
-        return cityRegisterService.save(city);
+        try {
+            return cityRegisterService.save(city);
+        } catch (EntityNotFoundException e){
+            throw new BusinessException(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
@@ -40,7 +45,11 @@ public class CityController {
         City foundCity = cityRegisterService.findOrFail(id);
         BeanUtils.copyProperties(city, foundCity, "id");
 
-        return cityRegisterService.save(foundCity);
+        try {
+            return cityRegisterService.save(foundCity);
+        } catch (EntityNotFoundException e){
+            throw new BusinessException(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
