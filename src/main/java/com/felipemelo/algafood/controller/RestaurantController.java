@@ -2,6 +2,8 @@ package com.felipemelo.algafood.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.felipemelo.algafood.domain.entity.Restaurant;
+import com.felipemelo.algafood.domain.exception.BusinessException;
+import com.felipemelo.algafood.domain.exception.EntityNotFoundException;
 import com.felipemelo.algafood.domain.service.RestaurantRegisterService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +35,11 @@ public class RestaurantController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Restaurant save(@RequestBody Restaurant restaurant){
-        return restaurantRegisterService.save(restaurant);
+        try{
+            return restaurantRegisterService.save(restaurant);
+        } catch(EntityNotFoundException e){
+            throw new BusinessException(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
@@ -42,7 +48,11 @@ public class RestaurantController {
         BeanUtils.copyProperties(restaurant, foundRestaurant, "id", "paymentMethods", "creationDate",
                 "address", "products");
 
-        return restaurantRegisterService.save(foundRestaurant);
+        try{
+            return restaurantRegisterService.save(foundRestaurant);
+        } catch(EntityNotFoundException e){
+            throw new BusinessException(e.getMessage());
+        }
     }
 
     @PatchMapping("/{restaurantId}")
