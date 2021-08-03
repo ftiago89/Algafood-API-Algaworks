@@ -1,13 +1,10 @@
-package com.felipemelo.algafood.controller;
+package com.felipemelo.algafood.api.controller;
 
 import com.felipemelo.algafood.domain.entity.State;
-import com.felipemelo.algafood.domain.exception.EntityInUseException;
-import com.felipemelo.algafood.domain.exception.EntityNotFoundException;
 import com.felipemelo.algafood.domain.service.StateRegisterService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

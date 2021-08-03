@@ -1,4 +1,4 @@
-package com.felipemelo.algafood.controller;
+package com.felipemelo.algafood.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.felipemelo.algafood.domain.entity.Restaurant;

@@ -1,4 +1,4 @@
-package com.felipemelo.algafood.controller;
+package com.felipemelo.algafood.api.controller;
 
 import com.felipemelo.algafood.domain.entity.Kitchen;
 import com.felipemelo.algafood.domain.service.KitchenRegisterService;
