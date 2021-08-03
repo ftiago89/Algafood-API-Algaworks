@@ -2,8 +2,8 @@ package com.felipemelo.algafood.domain.service;
 
 import com.felipemelo.algafood.domain.entity.City;
 import com.felipemelo.algafood.domain.entity.State;
+import com.felipemelo.algafood.domain.exception.CityNotFoundException;
 import com.felipemelo.algafood.domain.exception.EntityInUseException;
-import com.felipemelo.algafood.domain.exception.EntityNotFoundException;
 import com.felipemelo.algafood.domain.repository.ICityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,7 +15,6 @@ import java.util.List;
 @Service
 public class CityRegisterService {
 
-    public static final String CITY_NOT_FOUND = "City with code %d not found.";
     public static final String CITY_IN_USE = "City with code %d cannot be removed. It's in use by other entities";
 
     @Autowired
@@ -30,7 +29,7 @@ public class CityRegisterService {
 
     public City findOrFail(Long id){
         return cityRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException((String.format(CITY_NOT_FOUND, id))));
+                () -> new CityNotFoundException(id));
     }
 
     public City save(City city){
@@ -45,7 +44,7 @@ public class CityRegisterService {
         try{
             cityRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e){
-            throw new EntityNotFoundException(String.format(CITY_NOT_FOUND, id));
+            throw new CityNotFoundException(id);
         } catch (DataIntegrityViolationException e){
             throw new EntityInUseException(
                     String.format(CITY_IN_USE, id));

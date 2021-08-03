@@ -3,7 +3,7 @@ package com.felipemelo.algafood.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.felipemelo.algafood.domain.entity.Restaurant;
 import com.felipemelo.algafood.domain.exception.BusinessException;
-import com.felipemelo.algafood.domain.exception.EntityNotFoundException;
+import com.felipemelo.algafood.domain.exception.KitchenNotFoundException;
 import com.felipemelo.algafood.domain.service.RestaurantRegisterService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,20 +37,20 @@ public class RestaurantController {
     public Restaurant save(@RequestBody Restaurant restaurant){
         try{
             return restaurantRegisterService.save(restaurant);
-        } catch(EntityNotFoundException e){
+        } catch(KitchenNotFoundException e){
             throw new BusinessException(e.getMessage());
         }
     }
 
     @PutMapping("/{id}")
     public Restaurant update(@PathVariable Long id, @RequestBody Restaurant restaurant){
-        Restaurant foundRestaurant = restaurantRegisterService.findOrFail(id);
-        BeanUtils.copyProperties(restaurant, foundRestaurant, "id", "paymentMethods", "creationDate",
-                "address", "products");
-
         try{
+            Restaurant foundRestaurant = restaurantRegisterService.findOrFail(id);
+            BeanUtils.copyProperties(restaurant, foundRestaurant, "id", "paymentMethods", "creationDate",
+                    "address", "products");
+
             return restaurantRegisterService.save(foundRestaurant);
-        } catch(EntityNotFoundException e){
+        } catch(KitchenNotFoundException e){
             throw new BusinessException(e.getMessage());
         }
     }
