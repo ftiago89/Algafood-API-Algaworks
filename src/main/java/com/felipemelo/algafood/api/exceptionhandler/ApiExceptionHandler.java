@@ -11,15 +11,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.time.LocalDateTime;
-
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<?> handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request){
 
-        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+        var errorBody = createErrorBodyBuild(HttpStatus.NOT_FOUND, ErrorType.ENTITY_NOT_FOUND,
+                ex.getMessage()).build();
+
+        return handleExceptionInternal(ex, errorBody, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
     @ExceptionHandler(EntityInUseException.class)
@@ -40,16 +41,24 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         if (body == null){
             body = ErrorBody.builder()
-                    .dateTime(LocalDateTime.now())
-                    .message(status.getReasonPhrase())
+                    .title(status.getReasonPhrase())
+                    .status(status.value())
                     .build();
         } else if (body instanceof String){
             body = ErrorBody.builder()
-                    .dateTime(LocalDateTime.now())
-                    .message((String) body)
+                    .title((String) body)
+                    .status(status.value())
                     .build();
         }
 
         return super.handleExceptionInternal(ex, body, headers, status, request);
+    }
+
+    private ErrorBody.ErrorBodyBuilder createErrorBodyBuild(HttpStatus status, ErrorType errorType, String detail){
+        return ErrorBody.builder()
+                .status(status.value())
+                .type(errorType.getUri())
+                .title(errorType.getTitle())
+                .detail(detail);
     }
 }
