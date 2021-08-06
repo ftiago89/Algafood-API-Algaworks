@@ -26,13 +26,19 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(EntityInUseException.class)
     public ResponseEntity<?> handleEntityInUseException(EntityInUseException ex, WebRequest request){
 
-        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.CONFLICT, request);
+        var errorBody = createErrorBodyBuild(HttpStatus.CONFLICT, ErrorType.ENTITY_IN_USE,
+                ex.getMessage()).build();
+
+        return handleExceptionInternal(ex, errorBody, new HttpHeaders(), HttpStatus.CONFLICT, request);
     }
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<?> handleBusinessException(BusinessException ex, WebRequest request){
 
-        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+        var errorBody = createErrorBodyBuild(HttpStatus.BAD_REQUEST, ErrorType.BUSINESS_ERROR,
+                ex.getMessage()).build();
+
+        return handleExceptionInternal(ex, errorBody, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
     @Override
