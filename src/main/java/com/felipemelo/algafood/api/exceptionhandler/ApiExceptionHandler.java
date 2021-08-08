@@ -38,7 +38,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         var errorBody = createErrorBodyBuild(status, ErrorType.ILEGIBLE_REQUEST,
                 detail).build();
 
-        return handleExceptionInternal(ex, errorBody, new HttpHeaders(), status, request);
+        return handleExceptionInternal(ex, errorBody, headers, status, request);
     }
 
     private ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException ex, HttpHeaders headers,
@@ -51,7 +51,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         var errorBody = createErrorBodyBuild(status, ErrorType.ILEGIBLE_REQUEST,
                 detail).build();
 
-        return handleExceptionInternal(ex, errorBody, new HttpHeaders(), status, request);
+        return handleExceptionInternal(ex, errorBody, headers, status, request);
     }
 
     private ResponseEntity<Object> handlePropertyBindingException(PropertyBindingException ex, HttpHeaders headers,
@@ -63,7 +63,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         var errorBody = createErrorBodyBuild(status, ErrorType.ILEGIBLE_REQUEST,
                 detail).build();
 
-        return handleExceptionInternal(ex, errorBody, new HttpHeaders(), status, request);
+        return handleExceptionInternal(ex, errorBody, headers, status, request);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
