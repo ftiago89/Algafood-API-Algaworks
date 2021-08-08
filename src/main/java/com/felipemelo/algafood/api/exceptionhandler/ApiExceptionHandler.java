@@ -1,5 +1,7 @@
 package com.felipemelo.algafood.api.exceptionhandler;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.felipemelo.algafood.domain.exception.BusinessException;
 import com.felipemelo.algafood.domain.exception.EntityInUseException;
 import com.felipemelo.algafood.domain.exception.EntityNotFoundException;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.stream.Collectors;
+
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -20,7 +24,26 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   HttpHeaders headers, HttpStatus status,
                                                                   WebRequest request) {
 
+        var rootCause = ex.getRootCause();
+        if (rootCause instanceof InvalidFormatException){
+            return handleInvalidFormatException((InvalidFormatException) rootCause, headers, status, request);
+        }
+
         String detail = "Request body is invalid. Verify possible syntax problems";
+        var errorBody = createErrorBodyBuild(status, ErrorType.ILEGIBLE_REQUEST,
+                detail).build();
+
+        return handleExceptionInternal(ex, errorBody, new HttpHeaders(), status, request);
+    }
+
+    private ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException ex, HttpHeaders headers,
+                                                                HttpStatus status, WebRequest request) {
+
+        String path = ex.getPath().stream()
+                .map(JsonMappingException.Reference::getFieldName)
+                .collect(Collectors.joining("."));
+        String detail = String.format("Field '%s' with invalid value '%s'. Please correct with a valid value of type " +
+                "%s", path, ex.getValue(), ex.getTargetType().getSimpleName());
 
         var errorBody = createErrorBodyBuild(status, ErrorType.ILEGIBLE_REQUEST,
                 detail).build();
@@ -29,7 +52,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<?> handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request){
+    public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request){
 
         var errorBody = createErrorBodyBuild(HttpStatus.NOT_FOUND, ErrorType.ENTITY_NOT_FOUND,
                 ex.getMessage()).build();
@@ -38,7 +61,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(EntityInUseException.class)
-    public ResponseEntity<?> handleEntityInUseException(EntityInUseException ex, WebRequest request){
+    public ResponseEntity<Object> handleEntityInUseException(EntityInUseException ex, WebRequest request){
 
         var errorBody = createErrorBodyBuild(HttpStatus.CONFLICT, ErrorType.ENTITY_IN_USE,
                 ex.getMessage()).build();
@@ -47,7 +70,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<?> handleBusinessException(BusinessException ex, WebRequest request){
+    public ResponseEntity<Object> handleBusinessException(BusinessException ex, WebRequest request){
 
         var errorBody = createErrorBodyBuild(HttpStatus.BAD_REQUEST, ErrorType.BUSINESS_ERROR,
                 ex.getMessage()).build();
