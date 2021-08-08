@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.exc.PropertyBindingException;
 import com.felipemelo.algafood.domain.exception.BusinessException;
 import com.felipemelo.algafood.domain.exception.EntityInUseException;
 import com.felipemelo.algafood.domain.exception.EntityNotFoundException;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   HttpHeaders headers, HttpStatus status,
                                                                   WebRequest request) {
 
-        var rootCause = ex.getRootCause();
+        var rootCause = ExceptionUtils.getRootCause(ex);
 
         if (rootCause instanceof InvalidFormatException) {
             return handleInvalidFormatException((InvalidFormatException) rootCause, headers, status, request);

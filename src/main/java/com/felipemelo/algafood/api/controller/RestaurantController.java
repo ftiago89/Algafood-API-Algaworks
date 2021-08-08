@@ -1,16 +1,21 @@
 package com.felipemelo.algafood.api.controller;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.felipemelo.algafood.domain.entity.Restaurant;
 import com.felipemelo.algafood.domain.exception.BusinessException;
 import com.felipemelo.algafood.domain.exception.KitchenNotFoundException;
 import com.felipemelo.algafood.domain.service.RestaurantRegisterService;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -57,27 +62,36 @@ public class RestaurantController {
 
     @PatchMapping("/{restaurantId}")
     public Restaurant atualizarParcial(@PathVariable Long restaurantId,
-                                        @RequestBody Map<String, Object> fields) {
+                                       @RequestBody Map<String, Object> fields, HttpServletRequest request) {
         Restaurant actualRestaurant = restaurantRegisterService.findOrFail(restaurantId);
 
-        merge(fields, actualRestaurant);
+        merge(fields, actualRestaurant, request);
 
         return update(restaurantId, actualRestaurant);
     }
 
-    private void merge(Map<String, Object> originData, Restaurant destRestaurant) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Restaurant origRestaurant = objectMapper.convertValue(originData, Restaurant.class);
+    private void merge(Map<String, Object> originData, Restaurant destRestaurant, HttpServletRequest request) {
+        var servletServerHttpRequest = new ServletServerHttpRequest(request);
 
-        originData.forEach((propertyName, propertyValue) -> {
-            Field field = ReflectionUtils.findField(Restaurant.class, propertyName);
-            field.setAccessible(true);
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, true);
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
 
-            Object newValue = ReflectionUtils.getField(field, origRestaurant);
+            Restaurant origRestaurant = objectMapper.convertValue(originData, Restaurant.class);
 
-//			System.out.println(nomePropriedade + " = " + valorPropriedade + " = " + novoValor);
+            originData.forEach((propertyName, propertyValue) -> {
+                Field field = ReflectionUtils.findField(Restaurant.class, propertyName);
+                field.setAccessible(true);
 
-            ReflectionUtils.setField(field, destRestaurant, newValue);
-        });
+                Object newValue = ReflectionUtils.getField(field, origRestaurant);
+
+                ReflectionUtils.setField(field, destRestaurant, newValue);
+            });
+        } catch (IllegalArgumentException e) {
+            var rootCause = ExceptionUtils.getRootCause(e);
+            throw new HttpMessageNotReadableException(e.getMessage(), rootCause, servletServerHttpRequest);
+        }
+
     }
 }
