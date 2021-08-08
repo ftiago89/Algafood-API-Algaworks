@@ -7,6 +7,7 @@ import com.felipemelo.algafood.domain.exception.BusinessException;
 import com.felipemelo.algafood.domain.exception.EntityInUseException;
 import com.felipemelo.algafood.domain.exception.EntityNotFoundException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.List;
@@ -23,6 +25,28 @@ import java.util.stream.Collectors;
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
+    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers,
+                                                        HttpStatus status, WebRequest request) {
+
+        if (ex instanceof MethodArgumentTypeMismatchException) {
+            return handleMethodArgumentTypeMismatch((MethodArgumentTypeMismatchException) ex, headers, status, request);
+        }
+
+        return super.handleTypeMismatch(ex, headers, status, request);
+    }
+
+    private ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex,
+                                                                    HttpHeaders headers, HttpStatus status,
+                                                                    WebRequest request) {
+
+        String detail = String.format("URL parameter '%s' received value '%s' which is not valid. Use a compatible " +
+                "%s type", ex.getName(), ex.getValue(), ex.getParameter().getParameterType().getSimpleName());
+        var errorBody = createErrorBodyBuild(status, ErrorType.INVALID_PARAMETER, detail).build();
+
+        return handleExceptionInternal(ex, errorBody, headers, status, request);
+    }
+
+    @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
                                                                   HttpHeaders headers, HttpStatus status,
                                                                   WebRequest request) {
@@ -30,9 +54,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         var rootCause = ExceptionUtils.getRootCause(ex);
 
         if (rootCause instanceof InvalidFormatException) {
-            return handleInvalidFormatException((InvalidFormatException) rootCause, headers, status, request);
+            return handleInvalidFormat((InvalidFormatException) rootCause, headers, status, request);
         } else if (rootCause instanceof PropertyBindingException) {
-            return handlePropertyBindingException((PropertyBindingException) rootCause, headers, status, request);
+            return handlePropertyBinding((PropertyBindingException) rootCause, headers, status, request);
         }
 
         String detail = "Request body is invalid. Verify possible syntax problems";
@@ -42,8 +66,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, errorBody, headers, status, request);
     }
 
-    private ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException ex, HttpHeaders headers,
-                                                                HttpStatus status, WebRequest request) {
+    private ResponseEntity<Object> handleInvalidFormat(InvalidFormatException ex, HttpHeaders headers,
+                                                       HttpStatus status, WebRequest request) {
 
         String path = joinPath(ex.getPath());
         String detail = String.format("Field '%s' with invalid value '%s'. Please correct with a valid value of type " +
@@ -55,8 +79,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, errorBody, headers, status, request);
     }
 
-    private ResponseEntity<Object> handlePropertyBindingException(PropertyBindingException ex, HttpHeaders headers,
-                                                                  HttpStatus status, WebRequest request) {
+    private ResponseEntity<Object> handlePropertyBinding(PropertyBindingException ex, HttpHeaders headers,
+                                                         HttpStatus status, WebRequest request) {
 
         String path = joinPath(ex.getPath());
         String detail = String.format("Field '%s' does not exist", path);
@@ -68,7 +92,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request) {
+    public ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex, WebRequest request) {
 
         var errorBody = createErrorBodyBuild(HttpStatus.NOT_FOUND, ErrorType.ENTITY_NOT_FOUND,
                 ex.getMessage()).build();
@@ -77,7 +101,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(EntityInUseException.class)
-    public ResponseEntity<Object> handleEntityInUseException(EntityInUseException ex, WebRequest request) {
+    public ResponseEntity<Object> handleEntityInUse(EntityInUseException ex, WebRequest request) {
 
         var errorBody = createErrorBodyBuild(HttpStatus.CONFLICT, ErrorType.ENTITY_IN_USE,
                 ex.getMessage()).build();
@@ -86,7 +110,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<Object> handleBusinessException(BusinessException ex, WebRequest request) {
+    public ResponseEntity<Object> handleBusiness(BusinessException ex, WebRequest request) {
 
         var errorBody = createErrorBodyBuild(HttpStatus.BAD_REQUEST, ErrorType.BUSINESS_ERROR,
                 ex.getMessage()).build();
