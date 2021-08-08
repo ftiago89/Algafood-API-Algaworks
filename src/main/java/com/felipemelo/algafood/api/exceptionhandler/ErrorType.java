@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum ErrorType {
 
     INVALID_PARAMETER("/invalid-parameter", "Invalid parameter"),
-    ILEGIBLE_REQUEST("/ilegible-request", "Ilegible request"),
+    ILLEGIBLE_REQUEST("/ilegible-request", "Ilegible request"),
     ENTITY_NOT_FOUND("/entity-not-found", "Entity not found"),
     ENTITY_IN_USE("/entity-in-use", "Entity in use"),
     BUSINESS_ERROR("/business-error", "Business rule violation");

@@ -60,7 +60,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         }
 
         String detail = "Request body is invalid. Verify possible syntax problems";
-        var errorBody = createErrorBodyBuild(status, ErrorType.ILEGIBLE_REQUEST,
+        var errorBody = createErrorBodyBuild(status, ErrorType.ILLEGIBLE_REQUEST,
                 detail).build();
 
         return handleExceptionInternal(ex, errorBody, headers, status, request);
@@ -73,7 +73,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         String detail = String.format("Field '%s' with invalid value '%s'. Please correct with a valid value of type " +
                 "%s", path, ex.getValue(), ex.getTargetType().getSimpleName());
 
-        var errorBody = createErrorBodyBuild(status, ErrorType.ILEGIBLE_REQUEST,
+        var errorBody = createErrorBodyBuild(status, ErrorType.ILLEGIBLE_REQUEST,
                 detail).build();
 
         return handleExceptionInternal(ex, errorBody, headers, status, request);
@@ -85,7 +85,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         String path = joinPath(ex.getPath());
         String detail = String.format("Field '%s' does not exist", path);
 
-        var errorBody = createErrorBodyBuild(status, ErrorType.ILEGIBLE_REQUEST,
+        var errorBody = createErrorBodyBuild(status, ErrorType.ILLEGIBLE_REQUEST,
                 detail).build();
 
         return handleExceptionInternal(ex, errorBody, headers, status, request);
