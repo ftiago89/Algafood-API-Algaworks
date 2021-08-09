@@ -16,6 +16,7 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class RestaurantController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Restaurant save(@RequestBody Restaurant restaurant){
+    public Restaurant save(@RequestBody @Valid Restaurant restaurant){
         try{
             return restaurantRegisterService.save(restaurant);
         } catch(KitchenNotFoundException e){
