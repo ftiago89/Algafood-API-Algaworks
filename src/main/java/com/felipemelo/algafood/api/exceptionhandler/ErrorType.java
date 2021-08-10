@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum ErrorType {
 
+    INVALID_DATA("/invalid-data", "Invalid data"),
     INVALID_PARAMETER("/invalid-parameter", "Invalid parameter"),
     ILLEGIBLE_REQUEST("/ilegible-request", "Ilegible request"),
     RESOURCE_NOT_FOUND("/resource-not-found", "Resource not found"),

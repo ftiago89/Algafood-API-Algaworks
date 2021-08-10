@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -28,6 +29,18 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     public static final String USER_MSG_GENERIC_ERROR = "Unexpected system error. Please try again. If the problem " +
             "persists, contact system support";
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers,
+                                                                  HttpStatus status, WebRequest request) {
+
+        String detail = "One or more invalid fields. Please inform all request fields correctly";
+        var errorBody = createErrorBodyBuild(status, ErrorType.INVALID_DATA, detail)
+                .userMessage(detail)
+                .build();
+
+        return handleExceptionInternal(ex, errorBody, headers, status, request);
+    }
 
     @Override
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers,

@@ -14,10 +14,11 @@ import java.time.LocalDateTime;
 public class ErrorBody {
 
     private final Integer status;
+    private LocalDateTime timeStamp;
     private final String type;
     private final String title;
     private final String detail;
 
     private String userMessage;
-    private LocalDateTime timeStamp;
+
 }
