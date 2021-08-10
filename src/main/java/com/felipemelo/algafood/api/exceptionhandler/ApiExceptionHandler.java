@@ -35,7 +35,16 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   HttpStatus status, WebRequest request) {
 
         String detail = "One or more invalid fields. Please inform all request fields correctly";
+
+        List<ErrorBody.Field> errorFields = ex.getBindingResult().getFieldErrors().stream()
+                .map(fieldError -> ErrorBody.Field.builder()
+                    .name(fieldError.getField())
+                    .userMessage(fieldError.getDefaultMessage())
+                    .build())
+                .collect(Collectors.toList());
+
         var errorBody = createErrorBodyBuild(status, ErrorType.INVALID_DATA, detail)
+                .fields(errorFields)
                 .userMessage(detail)
                 .build();
 

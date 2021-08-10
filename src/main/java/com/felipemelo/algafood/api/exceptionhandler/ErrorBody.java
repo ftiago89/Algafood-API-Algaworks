@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -14,11 +15,19 @@ import java.time.LocalDateTime;
 public class ErrorBody {
 
     private final Integer status;
-    private LocalDateTime timeStamp;
+    private final LocalDateTime timeStamp;
     private final String type;
     private final String title;
     private final String detail;
+    private final String userMessage;
+    private final List<Field> fields;
 
-    private String userMessage;
+    @Getter
+    @Builder
+    public static class Field{
+
+        private final String name;
+        private final String userMessage;
+    }
 
 }
