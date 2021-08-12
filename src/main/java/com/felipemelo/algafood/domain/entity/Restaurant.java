@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
@@ -33,6 +34,8 @@ public class Restaurant {
     @Column(name = "delivery_tax", nullable = false)
     private BigDecimal deliveryTax;
 
+    @Valid
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "kitchen_id", nullable = false)
     private Kitchen kitchen;
