@@ -1,6 +1,7 @@
 package com.felipemelo.algafood.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.felipemelo.algafood.Groups;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
@@ -26,16 +27,16 @@ public class Restaurant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(groups = Groups.RestaurantRegister.class)
     @Column(nullable = false)
     private String name;
 
-    @PositiveOrZero
+    @PositiveOrZero(groups = Groups.RestaurantRegister.class)
     @Column(name = "delivery_tax", nullable = false)
     private BigDecimal deliveryTax;
 
     @Valid
-    @NotNull
+    @NotNull(groups = Groups.RestaurantRegister.class)
     @ManyToOne
     @JoinColumn(name = "kitchen_id", nullable = false)
     private Kitchen kitchen;

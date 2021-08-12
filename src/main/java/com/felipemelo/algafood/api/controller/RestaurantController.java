@@ -2,6 +2,7 @@ package com.felipemelo.algafood.api.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.felipemelo.algafood.Groups;
 import com.felipemelo.algafood.domain.entity.Restaurant;
 import com.felipemelo.algafood.domain.exception.BusinessException;
 import com.felipemelo.algafood.domain.exception.KitchenNotFoundException;
@@ -13,10 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class RestaurantController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Restaurant save(@RequestBody @Valid Restaurant restaurant){
+    public Restaurant save(@RequestBody @Validated(Groups.RestaurantRegister.class) Restaurant restaurant){
         try{
             return restaurantRegisterService.save(restaurant);
         } catch(KitchenNotFoundException e){
