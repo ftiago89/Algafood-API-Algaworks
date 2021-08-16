@@ -8,6 +8,9 @@ import com.felipemelo.algafood.domain.exception.EntityInUseException;
 import com.felipemelo.algafood.domain.exception.EntityNotFoundException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +33,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     public static final String USER_MSG_GENERIC_ERROR = "Unexpected system error. Please try again. If the problem " +
             "persists, contact system support";
 
+    @Autowired
+    private MessageSource messageSource;
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers,
                                                                   HttpStatus status, WebRequest request) {
@@ -37,10 +43,13 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         String detail = "One or more invalid fields. Please inform all request fields correctly";
 
         List<ErrorBody.Field> errorFields = ex.getBindingResult().getFieldErrors().stream()
-                .map(fieldError -> ErrorBody.Field.builder()
-                    .name(fieldError.getField())
-                    .userMessage(fieldError.getDefaultMessage())
-                    .build())
+                .map(fieldError -> {
+                    String message = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale());
+                    return ErrorBody.Field.builder()
+                            .name(fieldError.getField())
+                            .userMessage(message)
+                            .build();
+                })
                 .collect(Collectors.toList());
 
         var errorBody = createErrorBodyBuild(status, ErrorType.INVALID_DATA, detail)
