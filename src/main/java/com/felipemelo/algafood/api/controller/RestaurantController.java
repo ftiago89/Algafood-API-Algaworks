@@ -49,7 +49,7 @@ public class RestaurantController {
     }
 
     @PutMapping("/{id}")
-    public Restaurant update(@PathVariable Long id, @RequestBody Restaurant restaurant){
+    public Restaurant update(@PathVariable Long id, @RequestBody @Valid Restaurant restaurant){
         try{
             Restaurant foundRestaurant = restaurantRegisterService.findOrFail(id);
             BeanUtils.copyProperties(restaurant, foundRestaurant, "id", "paymentMethods", "creationDate",
