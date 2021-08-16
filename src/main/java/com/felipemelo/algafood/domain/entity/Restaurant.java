@@ -34,6 +34,7 @@ public class Restaurant {
     private String name;
 
     @PositiveOrZero
+    @NotNull
     @Column(name = "delivery_tax", nullable = false)
     private BigDecimal deliveryTax;
 
