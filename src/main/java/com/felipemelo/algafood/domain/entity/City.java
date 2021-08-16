@@ -1,6 +1,6 @@
 package com.felipemelo.algafood.domain.entity;
 
-import com.felipemelo.algafood.Groups;
+import com.felipemelo.algafood.core.validation.Groups;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
