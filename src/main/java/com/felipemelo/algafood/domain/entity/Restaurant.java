@@ -1,6 +1,7 @@
 package com.felipemelo.algafood.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.felipemelo.algafood.core.validation.DeliveryTax;
 import com.felipemelo.algafood.core.validation.Groups;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,7 +12,6 @@ import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 import java.math.BigDecimal;
@@ -33,7 +33,7 @@ public class Restaurant {
     @Column(nullable = false)
     private String name;
 
-    @PositiveOrZero
+    @DeliveryTax
     @NotNull
     @Column(name = "delivery_tax", nullable = false)
     private BigDecimal deliveryTax;
