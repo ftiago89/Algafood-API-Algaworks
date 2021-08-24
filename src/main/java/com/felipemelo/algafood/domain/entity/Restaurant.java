@@ -2,6 +2,7 @@ package com.felipemelo.algafood.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.felipemelo.algafood.core.validation.Groups;
+import com.felipemelo.algafood.core.validation.ValueZeroIncludesDescription;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
@@ -19,6 +20,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@ValueZeroIncludesDescription(valueField = "deliveryTax", descriptionField = "name",
+        mandatoryDescription = "free shipping")
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
