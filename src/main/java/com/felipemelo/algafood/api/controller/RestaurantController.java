@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.felipemelo.algafood.domain.entity.Restaurant;
 import com.felipemelo.algafood.domain.exception.BusinessException;
 import com.felipemelo.algafood.domain.exception.KitchenNotFoundException;
+import com.felipemelo.algafood.domain.exception.ValidationException;
 import com.felipemelo.algafood.domain.service.RestaurantRegisterService;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.BeanUtils;
@@ -13,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.SmartValidator;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +30,9 @@ public class RestaurantController {
 
     @Autowired
     private RestaurantRegisterService restaurantRegisterService;
+
+    @Autowired
+    private SmartValidator validator;
 
     @GetMapping
     public List<Restaurant> list(){
@@ -67,8 +73,18 @@ public class RestaurantController {
         Restaurant actualRestaurant = restaurantRegisterService.findOrFail(restaurantId);
 
         merge(fields, actualRestaurant, request);
+        validate(actualRestaurant, "restaurant");
 
         return update(restaurantId, actualRestaurant);
+    }
+
+    private void validate(Restaurant restaurant, String objectName) {
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(restaurant, objectName);
+        validator.validate(restaurant, bindingResult);
+
+        if (bindingResult.hasErrors()){
+            throw new ValidationException(bindingResult);
+        }
     }
 
     private void merge(Map<String, Object> originData, Restaurant destRestaurant, HttpServletRequest request) {
