@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.exc.PropertyBindingException;
 import com.felipemelo.algafood.domain.exception.BusinessException;
 import com.felipemelo.algafood.domain.exception.EntityInUseException;
 import com.felipemelo.algafood.domain.exception.EntityNotFoundException;
+import com.felipemelo.algafood.domain.exception.ValidationException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -40,31 +42,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers,
                                                                   HttpStatus status, WebRequest request) {
-
-        String detail = "One or more invalid fields. Please inform all request fields correctly";
-
-        List<ErrorBody.Object> errorObjects = ex.getBindingResult().getAllErrors().stream()
-                .map(objectError -> {
-                    String message = messageSource.getMessage(objectError, LocaleContextHolder.getLocale());
-
-                    String name = objectError.getObjectName();
-                    if (objectError instanceof FieldError){
-                        name = ((FieldError) objectError).getField();
-                    }
-
-                    return ErrorBody.Object.builder()
-                            .name(name)
-                            .userMessage(message)
-                            .build();
-                })
-                .collect(Collectors.toList());
-
-        var errorBody = createErrorBodyBuild(status, ErrorType.INVALID_DATA, detail)
-                .objects(errorObjects)
-                .userMessage(detail)
-                .build();
-
-        return handleExceptionInternal(ex, errorBody, headers, status, request);
+        return handleInvalidRequest(ex, ex.getBindingResult(), headers, status, request);
     }
 
     @Override
@@ -90,19 +68,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return super.handleTypeMismatch(ex, headers, status, request);
     }
 
-    private ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex,
-                                                                    HttpHeaders headers, HttpStatus status,
-                                                                    WebRequest request) {
-
-        String detail = String.format("URL parameter '%s' received value '%s' which is not valid. Use a compatible " +
-                "%s type", ex.getName(), ex.getValue(), ex.getParameter().getParameterType().getSimpleName());
-        var errorBody = createErrorBodyBuild(status, ErrorType.INVALID_PARAMETER, detail)
-                .userMessage(USER_MSG_GENERIC_ERROR)
-                .build();
-
-        return handleExceptionInternal(ex, errorBody, headers, status, request);
-    }
-
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
                                                                   HttpHeaders headers, HttpStatus status,
@@ -124,31 +89,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, errorBody, headers, status, request);
     }
 
-    private ResponseEntity<Object> handleInvalidFormat(InvalidFormatException ex, HttpHeaders headers,
-                                                       HttpStatus status, WebRequest request) {
-
-        String path = joinPath(ex.getPath());
-        String detail = String.format("Field '%s' with invalid value '%s'. Please correct with a valid value of type " +
-                "%s", path, ex.getValue(), ex.getTargetType().getSimpleName());
-
-        var errorBody = createErrorBodyBuild(status, ErrorType.ILLEGIBLE_REQUEST, detail)
-                .userMessage(USER_MSG_GENERIC_ERROR)
-                .build();
-
-        return handleExceptionInternal(ex, errorBody, headers, status, request);
-    }
-
-    private ResponseEntity<Object> handlePropertyBinding(PropertyBindingException ex, HttpHeaders headers,
-                                                         HttpStatus status, WebRequest request) {
-
-        String path = joinPath(ex.getPath());
-        String detail = String.format("Field '%s' does not exist", path);
-
-        var errorBody = createErrorBodyBuild(status, ErrorType.ILLEGIBLE_REQUEST, detail)
-                .userMessage(USER_MSG_GENERIC_ERROR)
-                .build();
-
-        return handleExceptionInternal(ex, errorBody, headers, status, request);
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<Object> handleValidationException(ValidationException ex, WebRequest request){
+        return handleInvalidRequest(ex, ex.getBindingResult(), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -220,6 +163,10 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return super.handleExceptionInternal(ex, body, headers, status, request);
     }
 
+    /*
+    * METODOS AUXILIARES
+    * */
+
     private ErrorBody.ErrorBodyBuilder createErrorBodyBuild(HttpStatus status, ErrorType errorType, String detail) {
         return ErrorBody.builder()
                 .status(status.value())
@@ -233,5 +180,74 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return references.stream()
                 .map(JsonMappingException.Reference::getFieldName)
                 .collect(Collectors.joining("."));
+    }
+
+    private ResponseEntity<Object> handleInvalidRequest(Exception ex, BindingResult bindingResult, HttpHeaders headers,
+                                                        HttpStatus status, WebRequest request){
+
+        String detail = "One or more invalid fields. Please inform all request fields correctly";
+
+        List<ErrorBody.Object> errorObjects = bindingResult.getAllErrors().stream()
+                .map(objectError -> {
+                    String message = messageSource.getMessage(objectError, LocaleContextHolder.getLocale());
+
+                    String name = objectError.getObjectName();
+                    if (objectError instanceof FieldError){
+                        name = ((FieldError) objectError).getField();
+                    }
+
+                    return ErrorBody.Object.builder()
+                            .name(name)
+                            .userMessage(message)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        var errorBody = createErrorBodyBuild(status, ErrorType.INVALID_DATA, detail)
+                .objects(errorObjects)
+                .userMessage(detail)
+                .build();
+
+        return handleExceptionInternal(ex, errorBody, headers, status, request);
+    }
+
+    private ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex,
+                                                                    HttpHeaders headers, HttpStatus status,
+                                                                    WebRequest request) {
+
+        String detail = String.format("URL parameter '%s' received value '%s' which is not valid. Use a compatible " +
+                "%s type", ex.getName(), ex.getValue(), ex.getParameter().getParameterType().getSimpleName());
+        var errorBody = createErrorBodyBuild(status, ErrorType.INVALID_PARAMETER, detail)
+                .userMessage(USER_MSG_GENERIC_ERROR)
+                .build();
+
+        return handleExceptionInternal(ex, errorBody, headers, status, request);
+    }
+
+    private ResponseEntity<Object> handleInvalidFormat(InvalidFormatException ex, HttpHeaders headers,
+                                                       HttpStatus status, WebRequest request) {
+
+        String path = joinPath(ex.getPath());
+        String detail = String.format("Field '%s' with invalid value '%s'. Please correct with a valid value of type " +
+                "%s", path, ex.getValue(), ex.getTargetType().getSimpleName());
+
+        var errorBody = createErrorBodyBuild(status, ErrorType.ILLEGIBLE_REQUEST, detail)
+                .userMessage(USER_MSG_GENERIC_ERROR)
+                .build();
+
+        return handleExceptionInternal(ex, errorBody, headers, status, request);
+    }
+
+    private ResponseEntity<Object> handlePropertyBinding(PropertyBindingException ex, HttpHeaders headers,
+                                                         HttpStatus status, WebRequest request) {
+
+        String path = joinPath(ex.getPath());
+        String detail = String.format("Field '%s' does not exist", path);
+
+        var errorBody = createErrorBodyBuild(status, ErrorType.ILLEGIBLE_REQUEST, detail)
+                .userMessage(USER_MSG_GENERIC_ERROR)
+                .build();
+
+        return handleExceptionInternal(ex, errorBody, headers, status, request);
     }
 }
