@@ -6,6 +6,7 @@ import com.felipemelo.algafood.domain.exception.RestaurantNotFoundException;
 import com.felipemelo.algafood.domain.repository.IRestaurantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class RestaurantRegisterService {
                 () -> new RestaurantNotFoundException(id));
     }
 
+    @Transactional
     public Restaurant save(Restaurant restaurant){
         Long kitchenId = restaurant.getKitchen().getId();
         Kitchen kitchen = kitchenRegisterService.findOrFail(kitchenId);

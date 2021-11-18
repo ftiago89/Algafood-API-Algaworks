@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class CityRegisterService {
                 () -> new CityNotFoundException(id));
     }
 
+    @Transactional
     public City save(City city){
         Long stateId = city.getState().getId();
         State state = stateRegisterService.findOrFail(stateId);
@@ -40,6 +42,7 @@ public class CityRegisterService {
         return cityRepository.save(city);
     }
 
+    @Transactional
     public void delete(Long id){
         try{
             cityRepository.deleteById(id);
