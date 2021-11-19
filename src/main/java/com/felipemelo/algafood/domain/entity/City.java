@@ -1,5 +1,6 @@
 package com.felipemelo.algafood.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.felipemelo.algafood.core.validation.Groups;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,6 +26,7 @@ public class City {
     @Column(nullable = false)
     private String name;
 
+    @JsonIgnoreProperties(value = "name", allowGetters = true)
     @ManyToOne
     @Valid
     @ConvertGroup(from = Default.class, to = Groups.StateId.class)

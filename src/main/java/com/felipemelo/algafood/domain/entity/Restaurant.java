@@ -17,7 +17,7 @@ import javax.validation.constraints.PositiveOrZero;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,15 +54,15 @@ public class Restaurant {
     @Embedded
     private Address address;
 
-    @JsonIgnore
+    //@JsonIgnore
     @CreationTimestamp
     @Column(nullable = false, columnDefinition = "datetime")
-    private LocalDateTime creationDate;
+    private OffsetDateTime creationDate;
 
     @JsonIgnore
     @UpdateTimestamp
     @Column(nullable = false, columnDefinition = "datetime")
-    private LocalDateTime updateDate;
+    private OffsetDateTime updateDate;
 
     @JsonIgnore
     @ManyToMany

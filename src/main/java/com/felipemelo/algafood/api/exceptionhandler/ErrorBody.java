@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Getter
@@ -15,7 +15,7 @@ import java.util.List;
 public class ErrorBody {
 
     private final Integer status;
-    private final LocalDateTime timeStamp;
+    private final OffsetDateTime timeStamp;
     private final String type;
     private final String title;
     private final String detail;
