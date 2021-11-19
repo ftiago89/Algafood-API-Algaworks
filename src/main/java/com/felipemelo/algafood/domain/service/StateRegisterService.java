@@ -2,7 +2,6 @@ package com.felipemelo.algafood.domain.service;
 
 import com.felipemelo.algafood.domain.entity.State;
 import com.felipemelo.algafood.domain.exception.EntityInUseException;
-import com.felipemelo.algafood.domain.exception.EntityNotFoundException;
 import com.felipemelo.algafood.domain.exception.StateNotFoundException;
 import com.felipemelo.algafood.domain.repository.IStateRepository;
 import org.springframework.beans.factory.annotation.Autowired;

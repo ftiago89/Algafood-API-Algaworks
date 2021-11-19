@@ -1,6 +1,7 @@
 package com.felipemelo.algafood.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.felipemelo.algafood.core.validation.Groups;
 import com.felipemelo.algafood.core.validation.ValueZeroIncludesDescription;
 import lombok.Data;
@@ -41,6 +42,7 @@ public class Restaurant {
     @Column(name = "delivery_tax", nullable = false)
     private BigDecimal deliveryTax;
 
+    @JsonIgnoreProperties(value = "name", allowGetters = true)
     @Valid
     @ConvertGroup(from = Default.class, to = Groups.KithenId.class)
     @NotNull
