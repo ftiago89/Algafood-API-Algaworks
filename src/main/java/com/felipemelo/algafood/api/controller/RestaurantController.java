@@ -1,5 +1,6 @@
 package com.felipemelo.algafood.api.controller;
 
+import com.felipemelo.algafood.api.assembler.RestaurantModelAssembler;
 import com.felipemelo.algafood.api.model.KitchenModel;
 import com.felipemelo.algafood.api.model.RestaurantModel;
 import com.felipemelo.algafood.api.model.input.RestaurantInput;
@@ -28,14 +29,17 @@ public class RestaurantController {
     @Autowired
     private SmartValidator validator;
 
+    @Autowired
+    private RestaurantModelAssembler restaurantModelAssembler;
+
     @GetMapping
     public List<RestaurantModel> list(){
-        return toCollectionModel(restaurantRegisterService.list());
+        return restaurantModelAssembler.toCollectionModel(restaurantRegisterService.list());
     }
 
     @GetMapping("/{id}")
     public RestaurantModel find(@PathVariable Long id){
-        return toModel(restaurantRegisterService.findOrFail(id));
+        return restaurantModelAssembler.toModel(restaurantRegisterService.findOrFail(id));
     }
 
     @PostMapping
@@ -43,7 +47,7 @@ public class RestaurantController {
     public RestaurantModel save(@RequestBody @Valid RestaurantInput restaurantInput){
         try{
             var restaurant = toDomainModel(restaurantInput);
-            return toModel(restaurantRegisterService.save(restaurant));
+            return restaurantModelAssembler.toModel(restaurantRegisterService.save(restaurant));
         } catch(KitchenNotFoundException e){
             throw new BusinessException(e.getMessage());
         }
@@ -57,29 +61,10 @@ public class RestaurantController {
             BeanUtils.copyProperties(restaurant, foundRestaurant, "id", "paymentMethods", "creationDate",
                     "address", "products");
 
-            return toModel(restaurantRegisterService.save(foundRestaurant));
+            return restaurantModelAssembler.toModel(restaurantRegisterService.save(foundRestaurant));
         } catch(KitchenNotFoundException e){
             throw new BusinessException(e.getMessage());
         }
-    }
-
-    private RestaurantModel toModel(Restaurant restaurant) {
-        var kitchenModel = new KitchenModel();
-        kitchenModel.setId(restaurant.getKitchen().getId());
-        kitchenModel.setName(restaurant.getKitchen().getName());
-
-        var restaurantModel = new RestaurantModel();
-        restaurantModel.setId(restaurant.getId());
-        restaurantModel.setName(restaurant.getName());
-        restaurantModel.setDeliveryTax(restaurant.getDeliveryTax());
-        restaurantModel.setKitchen(kitchenModel);
-
-        return restaurantModel;
-    }
-
-    private List<RestaurantModel> toCollectionModel(List<Restaurant> restaurants) {
-        return restaurants.stream().map(this::toModel)
-                .collect(Collectors.toList());
     }
 
     private Restaurant toDomainModel(RestaurantInput restaurantInput) {
