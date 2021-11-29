@@ -1,13 +1,11 @@
 package com.felipemelo.algafood.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.felipemelo.algafood.core.validation.Groups;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +14,6 @@ import java.util.List;
 @Entity
 public class Kitchen {
 
-    @NotNull(groups = Groups.KithenId.class)
     @EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

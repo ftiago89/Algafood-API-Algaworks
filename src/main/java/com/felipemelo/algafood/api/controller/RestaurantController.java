@@ -2,6 +2,8 @@ package com.felipemelo.algafood.api.controller;
 
 import com.felipemelo.algafood.api.model.KitchenModel;
 import com.felipemelo.algafood.api.model.RestaurantModel;
+import com.felipemelo.algafood.api.model.input.RestaurantInput;
+import com.felipemelo.algafood.domain.entity.Kitchen;
 import com.felipemelo.algafood.domain.entity.Restaurant;
 import com.felipemelo.algafood.domain.exception.BusinessException;
 import com.felipemelo.algafood.domain.exception.KitchenNotFoundException;
@@ -38,8 +40,9 @@ public class RestaurantController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RestaurantModel save(@RequestBody @Valid Restaurant restaurant){
+    public RestaurantModel save(@RequestBody @Valid RestaurantInput restaurantInput){
         try{
+            var restaurant = toDomainModel(restaurantInput);
             return toModel(restaurantRegisterService.save(restaurant));
         } catch(KitchenNotFoundException e){
             throw new BusinessException(e.getMessage());
@@ -47,8 +50,9 @@ public class RestaurantController {
     }
 
     @PutMapping("/{id}")
-    public RestaurantModel update(@PathVariable Long id, @RequestBody @Valid Restaurant restaurant){
+    public RestaurantModel update(@PathVariable Long id, @RequestBody @Valid RestaurantInput restaurantInput){
         try{
+            var restaurant = toDomainModel(restaurantInput);
             Restaurant foundRestaurant = restaurantRegisterService.findOrFail(id);
             BeanUtils.copyProperties(restaurant, foundRestaurant, "id", "paymentMethods", "creationDate",
                     "address", "products");
@@ -76,5 +80,18 @@ public class RestaurantController {
     private List<RestaurantModel> toCollectionModel(List<Restaurant> restaurants) {
         return restaurants.stream().map(this::toModel)
                 .collect(Collectors.toList());
+    }
+
+    private Restaurant toDomainModel(RestaurantInput restaurantInput) {
+        var restaurant = new Restaurant();
+        restaurant.setName(restaurantInput.getName());
+        restaurant.setDeliveryTax(restaurantInput.getDeliveryTax());
+
+        var kitchen = new Kitchen();
+        kitchen.setId(restaurantInput.getKitchen().getId());
+
+        restaurant.setKitchen(kitchen);
+
+        return restaurant;
     }
 }
