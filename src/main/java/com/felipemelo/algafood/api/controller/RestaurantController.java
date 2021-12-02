@@ -1,7 +1,7 @@
 package com.felipemelo.algafood.api.controller;
 
+import com.felipemelo.algafood.api.assembler.RestaurantInputDisassembler;
 import com.felipemelo.algafood.api.assembler.RestaurantModelAssembler;
-import com.felipemelo.algafood.api.model.KitchenModel;
 import com.felipemelo.algafood.api.model.RestaurantModel;
 import com.felipemelo.algafood.api.model.input.RestaurantInput;
 import com.felipemelo.algafood.domain.entity.Kitchen;
@@ -12,12 +12,10 @@ import com.felipemelo.algafood.domain.service.RestaurantRegisterService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.SmartValidator;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/restaurants")
@@ -27,10 +25,10 @@ public class RestaurantController {
     private RestaurantRegisterService restaurantRegisterService;
 
     @Autowired
-    private SmartValidator validator;
+    private RestaurantModelAssembler restaurantModelAssembler;
 
     @Autowired
-    private RestaurantModelAssembler restaurantModelAssembler;
+    private RestaurantInputDisassembler restaurantInputDisassembler;
 
     @GetMapping
     public List<RestaurantModel> list(){
@@ -46,7 +44,7 @@ public class RestaurantController {
     @ResponseStatus(HttpStatus.CREATED)
     public RestaurantModel save(@RequestBody @Valid RestaurantInput restaurantInput){
         try{
-            var restaurant = toDomainModel(restaurantInput);
+            var restaurant = restaurantInputDisassembler.toDomainModel(restaurantInput);
             return restaurantModelAssembler.toModel(restaurantRegisterService.save(restaurant));
         } catch(KitchenNotFoundException e){
             throw new BusinessException(e.getMessage());
@@ -56,7 +54,7 @@ public class RestaurantController {
     @PutMapping("/{id}")
     public RestaurantModel update(@PathVariable Long id, @RequestBody @Valid RestaurantInput restaurantInput){
         try{
-            var restaurant = toDomainModel(restaurantInput);
+            var restaurant = restaurantInputDisassembler.toDomainModel(restaurantInput);
             Restaurant foundRestaurant = restaurantRegisterService.findOrFail(id);
             BeanUtils.copyProperties(restaurant, foundRestaurant, "id", "paymentMethods", "creationDate",
                     "address", "products");
@@ -65,18 +63,5 @@ public class RestaurantController {
         } catch(KitchenNotFoundException e){
             throw new BusinessException(e.getMessage());
         }
-    }
-
-    private Restaurant toDomainModel(RestaurantInput restaurantInput) {
-        var restaurant = new Restaurant();
-        restaurant.setName(restaurantInput.getName());
-        restaurant.setDeliveryTax(restaurantInput.getDeliveryTax());
-
-        var kitchen = new Kitchen();
-        kitchen.setId(restaurantInput.getKitchen().getId());
-
-        restaurant.setKitchen(kitchen);
-
-        return restaurant;
     }
 }
