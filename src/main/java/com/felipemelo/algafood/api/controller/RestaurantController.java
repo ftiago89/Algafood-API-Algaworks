@@ -4,7 +4,6 @@ import com.felipemelo.algafood.api.assembler.RestaurantInputDisassembler;
 import com.felipemelo.algafood.api.assembler.RestaurantModelAssembler;
 import com.felipemelo.algafood.api.model.RestaurantModel;
 import com.felipemelo.algafood.api.model.input.RestaurantInput;
-import com.felipemelo.algafood.domain.entity.Kitchen;
 import com.felipemelo.algafood.domain.entity.Restaurant;
 import com.felipemelo.algafood.domain.exception.BusinessException;
 import com.felipemelo.algafood.domain.exception.KitchenNotFoundException;
